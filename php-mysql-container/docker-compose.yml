@@ -2,18 +2,26 @@ version: '3'
 services:
   apache-php:
     build:
-      context: ./apache-php
+      context: ./docker/apache-php
     volumes:
       - .:/var/www/html
+      - ./docker/apache-php/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./docker/apache-php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./docker/apache-php/httpd.conf:/etc/apache2/conf-enabled/httpd.conf
     ports:
       - "8000:80"
+    links:
+      - mysql
   mysql:
     build:
-      context: ./mysql
+      context: ./docker/mysql
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d
     ports:
      - "3306"
     environment:
      - MYSQL_ROOT_PASSWORD=root
      - MYSQL_DATABASE=test
      - MYSQL_USER=user
-     - MYSQL_PASSWORD=password
+     - MYSQL_PASSWORD=root
+     - MYSQL_HOST=mysql
